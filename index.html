@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Online Kaotak</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f9; --text-color: #333; --card-bg: #fff; --primary-color: #ff6f61;
+            --secondary-color: #555; --border-color: #e0e0e0; --shadow-color: rgba(0,0,0,0.08);
+            --modal-bg: rgba(0,0,0,0.6); --skeleton-bg: #e0e0e0; --skeleton-highlight: #f5f5f5;
+        }
+        [data-theme="dark"] {
+            --bg-color: #1e1e1e; --text-color: #f1f1f1; --card-bg: #2c2c2c; --primary-color: #ff8a80;
+            --secondary-color: #bbb; --border-color: #444; --shadow-color: rgba(0,0,0,0.25);
+            --modal-bg: rgba(0,0,0,0.7); --skeleton-bg: #333; --skeleton-highlight: #444;
+        }
+        html { font-size: 62.5%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0 0 8rem 0; background-color: var(--bg-color); color: var(--text-color);
+            transition: background-color 0.2s, color 0.2s; -webkit-tap-highlight-color: transparent;
+        }
+        /* Skeleton Loader */
+        .skeleton-loader{padding:1.5rem}.skeleton{background-color:var(--skeleton-bg);border-radius:.8rem;margin-bottom:1.5rem;position:relative;overflow:hidden}.skeleton::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;transform:translateX(-100%);background-image:linear-gradient(90deg,transparent,var(--skeleton-highlight),transparent);animation:shimmer 1.5s infinite}.skeleton.text{width:60%;height:2rem;margin-bottom:1rem}.skeleton.header{width:100%;height:15rem}.skeleton-categories{display:flex;gap:1.5rem}.skeleton.category{width:6rem;height:7.7rem}.skeleton.category-icon{width:5rem;height:5rem;border-radius:50%;margin:0 auto .5rem}.skeleton.category-text{height:1.2rem;width:100%}.skeleton-products{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem}.skeleton.product{height:20rem}.skeleton.product-img{height:12rem}.skeleton.product-title{height:1.4rem;width:80%;margin:1rem 1rem .5rem}.skeleton.product-price{height:1.4rem;width:50%;margin:0 1rem 1rem}@keyframes shimmer{100%{transform:translateX(100%)}}
+        /* Main App */
+        .top-bar{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background-color:var(--card-bg);box-shadow:0 .2rem .4rem var(--shadow-color);position:sticky;top:0;z-index:1000}.top-bar-icon{font-size:2.4rem;cursor:pointer}
+        .store-header{padding:2rem;text-align:center}.store-header img{width:100%;max-width:40rem;height:15rem;border-radius:1.5rem;object-fit:cover;box-shadow:0 .4rem .8rem var(--shadow-color);background-color:#ccc}
+        .content-padding{padding:0 2rem}.content-padding h2{margin:1rem 0;font-size:2rem}
+        .category-container{display:flex;justify-content:center}.category-icons{display:flex;gap:1.5rem;overflow-x:auto;padding:1rem 0;-ms-overflow-style:none;scrollbar-width:none}.category-icons::-webkit-scrollbar{display:none}.category-icon{cursor:pointer;text-align:center;min-width:7rem}.category-icon div{width:5rem;height:5rem;background-color:var(--card-bg);border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2.4rem;margin:0 auto .5rem;box-shadow:0 .2rem .4rem var(--shadow-color);transition:transform .2s,background-color .2s}.category-icon.active div{background-color:var(--primary-color);color:#fff}.category-icon span{font-size:1.2rem}
+        .product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-top:2rem}.product-card{background-color:var(--card-bg);border-radius:1rem;box-shadow:0 .2rem .5rem var(--shadow-color);overflow:hidden;cursor:pointer;transition:transform .2s}.product-card:hover{transform:translateY(-.5rem)}.product-card img{width:100%;height:12rem;object-fit:cover}.product-card-info{padding:1rem}.product-card-info h3{font-size:1.4rem;margin:0 0 .5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.product-card-info p{font-size:1.4rem;font-weight:bold;margin:0;color:var(--primary-color)}
+        .bottom-nav{position:fixed;bottom:0;left:0;right:0;background-color:var(--card-bg);display:flex;justify-content:space-around;padding:1rem 0;box-shadow:0 -.2rem .5rem var(--shadow-color);z-index:1000;border-top:1px solid var(--border-color)}.nav-icon{cursor:pointer;text-align:center;font-size:1.2rem;color:var(--secondary-color);position:relative;flex-grow:1}.nav-icon-img{font-size:2.4rem}.nav-icon.active{color:var(--primary-color)}#cart-indicator{position:absolute;top:-.5rem;right:calc(50% - 2.5rem);background-color:red;color:white;border-radius:50%;width:1.8rem;height:1.8rem;font-size:1.2rem;display:flex;justify-content:center;align-items:center;font-weight:bold;transform:scale(0);transition:transform .2s}#cart-indicator.visible{transform:scale(1)}
+        /* Modal Styles */
+        .modal{display:none;position:fixed;z-index:2000;left:0;top:0;width:100%;height:100%;overflow-y:auto;padding-top:10vh;background-color:var(--modal-bg);animation:fadeIn .3s}.modal-content{background-color:var(--bg-color);margin:auto;padding:2rem;border-radius:1.5rem;width:90%;max-width:50rem;position:relative;animation:slideUp .3s ease-out;box-shadow:0 .5rem 1.5rem rgba(0,0,0,0.2)}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideUp{from{transform:translateY(3rem);opacity:0}to{transform:translateY(0);opacity:1}}
+        .modal-header h2{margin:0;font-size:1.8rem}.close-btn{font-size:3rem;font-weight:bold;cursor:pointer;color:var(--secondary-color);position:absolute;top:.5rem;right:1.5rem}
+        #popup-product-img{width:100%;height:20rem;object-fit:cover;border-radius:1rem;margin-bottom:1.5rem}#popup-product-variants .variant{display:inline-block;padding:.8rem 1.5rem;background-color:var(--card-bg);border:1px solid var(--border-color);border-radius:2rem;margin:.5rem .5rem .5rem 0;cursor:pointer;transition:background-color .2s}#popup-product-variants .variant.selected{background-color:var(--primary-color);color:white;border-color:var(--primary-color)}
+        .qty-selector{display:flex;align-items:center;justify-content:center;margin:2rem 0}.qty-btn{background-color:var(--primary-color);color:white;border:none;width:3.5rem;height:3.5rem;border-radius:50%;font-size:2rem;cursor:pointer}.qty-input{width:5rem;text-align:center;font-size:1.8rem;border:none;background-color:transparent;color:var(--text-color);margin:0 1.5rem}
+        .add-to-cart-btn{display:block;width:100%;padding:1.5rem;background-color:var(--primary-color);color:white;border:none;border-radius:1rem;font-size:1.6rem;cursor:pointer;margin-top:1.5rem;font-weight:bold}.add-to-cart-btn:disabled{background-color:#ccc}
+        .cart-item-list{max-height:35vh;overflow-y:auto;padding-right:1rem;margin:1.5rem 0}.cart-item{display:flex;align-items:center;gap:1.5rem;padding:1rem 0;border-bottom:1px solid var(--border-color)}.cart-item:last-child{border-bottom:none}.cart-item img{width:6rem;height:6rem;object-fit:cover;border-radius:.8rem}.cart-item-info{flex-grow:1}.cart-item-info h4,.cart-item-info p{margin:0;font-size:1.4rem}
+        .cart-footer{padding-top:1.5rem;border-top:1px solid var(--border-color)}.cart-footer textarea{width:100%;box-sizing:border-box;padding:1rem;border-radius:.5rem;border:1px solid var(--border-color);margin-bottom:1rem;background-color:var(--bg-color);color:var(--text-color)}.cart-footer span{font-weight:bold;font-size:1.8rem}.cart-footer button{display:block;width:100%;padding:1.5rem;background-color:#25D366;color:white;border:none;border-radius:1rem;font-size:1.6rem;cursor:pointer;margin-top:1rem;font-weight:bold}.empty-message{text-align:center;padding:4rem 2rem;color:#888;font-size:1.6rem}
+        .notification-list{max-height:60vh;overflow-y:auto;padding:.5rem}.notification-item{background-color:var(--card-bg);padding:1.5rem;border-radius:.8rem;margin-bottom:1rem;box-shadow:0 .1rem .3rem var(--shadow-color)}.notification-item p{margin:0;font-size:1.4rem;line-height:1.5}.notification-item .date{font-size:1.2rem;color:#888;margin-top:1rem;text-align:right}
+        .admin-tabs{display:flex;border-bottom:1px solid var(--border-color)}.admin-tab{padding:1rem 1.5rem;cursor:pointer;background-color:transparent;border:none;color:var(--text-color);font-size:1.4rem;border-bottom:3px solid transparent}.admin-tab.active{border-bottom:3px solid var(--primary-color);font-weight:bold}.admin-content{display:none;padding:1.5rem 0;max-height:50vh;overflow-y:auto}.admin-content.active{display:block}.admin-form{display:flex;flex-direction:column;gap:1rem}.admin-form input,.admin-form textarea,.admin-form button{padding:1.2rem;border-radius:.5rem;border:1px solid var(--border-color);background-color:var(--bg-color);color:var(--text-color);font-size:1.4rem}.admin-form button{background-color:var(--primary-color);color:white;cursor:pointer;font-weight:bold}.admin-table{width:100%;border-collapse:collapse;font-size:1.2rem}.admin-table th,.admin-table td{padding:1rem;border:1px solid var(--border-color);text-align:left}.admin-table button{padding:.5rem .8rem;font-size:1.2rem;cursor:pointer;margin-right:.5rem;border-radius:.5rem;border:1px solid var(--primary-color);background-color:transparent;color:var(--primary-color)}.admin-table .delete-product-btn{border-color:#888;color:#888}#force-update-btn{background-color:var(--secondary-color);margin-top:2rem}
+        .hidden{display:none!important}
+    </style>
+</head>
+<body>
+
+    <div id="skeleton-loader">
+        <div class="skeleton-loader">
+            <div class="skeleton header"></div><div class="skeleton text" style="width:40%"></div>
+            <div class="skeleton-categories">
+                <div class="skeleton category"><div class="skeleton category-icon"></div><div class="skeleton category-text"></div></div>
+                <div class="skeleton category"><div class="skeleton category-icon"></div><div class="skeleton category-text"></div></div>
+                <div class="skeleton category"><div class="skeleton category-icon"></div><div class="skeleton category-text"></div></div>
+                <div class="skeleton category"><div class="skeleton category-icon"></div><div class="skeleton category-text"></div></div>
+            </div>
+            <div class="skeleton-products">
+                <div class="skeleton product"></div><div class="skeleton product"></div>
+                <div class="skeleton product"></div><div class="skeleton product"></div>
+            </div>
+        </div>
+    </div>
+
+    <main id="app-container" style="display:none;">
+        <div class="top-bar">
+            <div id="admin-icon" class="top-bar-icon">🔑</div>
+            <div id="theme-switcher" class="top-bar-icon">🌙</div>
+        </div>
+        <header class="store-header">
+            <img id="store-banner" src="" alt="Banner Toko">
+        </header>
+        <div class="content-padding">
+            <h2>Kategori</h2>
+            <div class="category-container">
+                 <div id="category-list" class="category-icons"></div>
+            </div>
+        </div>
+        <div class="content-padding">
+            <div id="product-list" class="product-grid"></div>
+        </div>
+        <nav class="bottom-nav">
+            <div id="home-btn" class="nav-icon active"><div class="nav-icon-img">🏠</div><span>Home</span></div>
+            <div id="cart-btn" class="nav-icon"><div class="nav-icon-img">🛒</div><span>Keranjang</span><div id="cart-indicator">0</div></div>
+            <div id="notif-btn" class="nav-icon"><div class="nav-icon-img">🔔</div><span>Notifikasi</span></div>
+        </nav>
+    </main>
+
+    <div id="product-popup" class="modal"></div>
+    <div id="cart-modal" class="modal"></div>
+    <div id="notification-modal" class="modal"></div>
+    <div id="admin-modal" class="modal"></div>
+
+    <script>
+        // ===================================================================================
+        // PENGATURAN PENTING - JANGAN LUPA DIISI
+        // ===================================================================================
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLdFAFQZHVwjkMDkGylD2w7er3ACEACBhtUgHFSteti0XfLT_vHN1SoDAPzSpRpgD5/exec"; // <-- PASTE URL DARI GOOGLE APPS SCRIPT
+        const ADMIN_PASSWORD = "hyra";
+        const WHATSAPP_NUMBER = "6285161231424";
+        const CUSTOM_HEADER_IMAGE = "https://i.postimg.cc/gJFgD3Gd/Whats-App-Image-2025-07-30-at-04-29-34.jpg";
+        // ===================================================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            let allProducts = [];
+            let allNotifications = [];
+            let cart = [];
+            let currentCategory = 'Semua';
+
+            const skeletonLoader = document.getElementById('skeleton-loader');
+            const appContainer = document.getElementById('app-container');
+            const storeBanner = document.getElementById('store-banner');
+            const categoryList = document.getElementById('category-list');
+            const productList = document.getElementById('product-list');
+            const cartIndicator = document.getElementById('cart-indicator');
+            
+            const productPopup = document.getElementById('product-popup');
+            const cartModal = document.getElementById('cart-modal');
+            const notificationModal = document.getElementById('notification-modal');
+            const adminModal = document.getElementById('admin-modal');
+
+            // === Main App Initialization with Hybrid Cache ===
+            async function initializeApp() {
+                loadTheme();
+                storeBanner.src = CUSTOM_HEADER_IMAGE;
+                
+                let isDataLoaded = false;
+                
+                // 1. Coba muat dari cache dulu agar instan
+                const cachedData = getCache('appData');
+                if (cachedData) {
+                    allProducts = cachedData.products;
+                    allNotifications = cachedData.notifications;
+                    renderUI();
+                    isDataLoaded = true;
+                }
+
+                // 2. Apapun yang terjadi, selalu fetch data baru di background
+                try {
+                    const freshData = await fetchFreshData();
+                    // Hanya update & re-render jika data baru beda dari data yang ditampilkan
+                    if (JSON.stringify(freshData) !== JSON.stringify({products: allProducts, notifications: allNotifications})) {
+                        allProducts = freshData.products;
+                        allNotifications = freshData.notifications;
+                        setCache('appData', freshData); // Simpan data baru ke cache
+                        if (isDataLoaded) { // Jika sudah ada data, re-render
+                            renderUI(true);
+                        }
+                    }
+                     if (!isDataLoaded) { // Jika belum ada data sama sekali (first load)
+                        renderUI();
+                    }
+                } catch (error) {
+                    if (!isDataLoaded) {
+                        skeletonLoader.innerHTML = `<p class="empty-message">Gagal memuat data. Periksa koneksi atau URL Script Anda.</p>`;
+                    }
+                    console.error("Fetch Error:", error);
+                }
+            }
+            
+            // Fungsi baru untuk mengambil data
+            async function fetchFreshData() {
+                 const cacheBuster = "&t=" + new Date().getTime();
+                 const productURL = `${SCRIPT_URL}?action=getProducts${cacheBuster}`;
+                 const notifURL = `${SCRIPT_URL}?action=getNotifications${cacheBuster}`;
+                 const [products, notifications] = await Promise.all([
+                    fetch(productURL).then(res => res.json()),
+                    fetch(notifURL).then(res => res.json())
+                ]);
+                return { products, notifications };
+            }
+            
+            // Fungsi untuk render semua komponen UI
+            function renderUI(isUpdate = false) {
+                 if (!isUpdate) { // Hanya dijalankan sekali saat loading awal
+                    loadCartFromStorage();
+                    attachEventListeners();
+                    skeletonLoader.style.display = 'none';
+                    appContainer.style.display = 'block';
+                }
+                // Selalu render kategori dan produk saat ada data baru
+                renderCategories();
+                renderProducts();
+            }
+
+            // === Cache Functions ===
+            const setCache = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); } catch (e) { console.error("Cache save failed", e); } };
+            const getCache = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } };
+            const clearCache = () => { localStorage.clear(); alert('Cache dibersihkan. Memuat ulang...'); location.reload(); }
+            
+            // ... sisa fungsi lainnya tetap sama ...
+            function renderCategories() {
+                const categories = ['Semua', ...new Set(allProducts.map(p => p.kategori))];
+                categoryList.innerHTML = categories.map(cat => {
+                    const iconMap = { "Risoles": "🌯", "Chicken Crispy": "🍗", "Adds": "➕", "Semua": "✨" };
+                    const isActive = cat === currentCategory ? 'active' : '';
+                    return `<div class="category-icon ${isActive}" data-category="${cat}"><div>${iconMap[cat] || '📦'}</div><span>${cat}</span></div>`;
+                }).join('');
+            }
+            function renderProducts() {
+                const filtered = currentCategory === 'Semua' ? allProducts : allProducts.filter(p => p.kategori === currentCategory);
+                if(filtered.length === 0) {
+                    productList.innerHTML = `<p class="empty-message">Tidak ada produk.</p>`;
+                    return;
+                }
+                productList.innerHTML = filtered.map(product => `
+                    <div class="product-card" data-id="${product.id}">
+                        <img src="${product.gambar}" alt="${product.nama}" loading="lazy">
+                        <div class="product-card-info"><h3>${product.nama}</h3><p>${formatRupiah(product.harga)}</p></div>
+                    </div>`).join('');
+            }
+
+            const openModal = (modal) => modal.style.display = 'block';
+            const closeModal = (modal) => modal.style.display = 'none';
+
+            function showCart() {
+                let cartHTML;
+                if (cart.length === 0) {
+                    cartHTML = `<div class="modal-content"><span class="close-btn">&times;</span><h2>Keranjang Belanja</h2><p class="empty-message">Keranjang kosong!</p></div>`;
+                } else {
+                    const cartItemsHTML = cart.map(item => `<div class="cart-item" data-id="${item.id}" data-varian="${item.varianDipilih || ''}"><img src="${item.gambar}" alt="${item.nama}"><div class="cart-item-info"><h4>${item.nama} ${item.varianDipilih ? `(${item.varianDipilih})` : ''}</h4><p>${formatRupiah(item.harga)} x ${item.qty} = ${formatRupiah(item.harga * item.qty)}</p></div><div class="qty-selector" style="margin:0;"><button class="qty-btn" data-action="decrease">-</button><span class="qty-input">${item.qty}</span><button class="qty-btn" data-action="increase">+</button></div></div>`).join('');
+                    const total = cart.reduce((sum, i) => sum + (i.harga * i.qty), 0);
+                    cartHTML = `<div class="modal-content"><span class="close-btn">&times;</span><h2>Keranjang Belanja</h2><div class="cart-item-list">${cartItemsHTML}</div><div class="cart-footer"><textarea id="cart-notes" placeholder="Tulis catatan..."></textarea><div>Total: <span id="total-price">${formatRupiah(total)}</span></div><button id="order-btn">Pesan via WhatsApp</button></div></div>`;
+                }
+                cartModal.innerHTML = cartHTML;
+                openModal(cartModal);
+            }
+            function openProductPopup(productId) {
+                const p = allProducts.find(p => p.id === productId);
+                if (!p) return;
+                const variants = p.varian ? p.varian.split(',').map(v => v.trim()).filter(v => v) : [];
+                productPopup.innerHTML = `<div class="modal-content"><span class="close-btn">&times;</span><img id="popup-product-img" src="${p.gambar}" alt="${p.nama}"><h2>${p.nama}</h2><p style="font-weight:bold;font-size:1.8rem;">${formatRupiah(p.harga)}</p>${variants.length > 0 ? `<p>Pilih Varian:</p><div id="popup-product-variants">${variants.map(v => `<span class="variant">${v}</span>`).join('')}</div>` : ''}<div class="qty-selector"><button class="qty-btn" data-action="decrease">-</button><input type="number" class="qty-input" value="1" min="1" readonly><button class="qty-btn" data-action="increase">+</button></div><button class="add-to-cart-btn" ${variants.length > 0 ? 'disabled' : ''}>+ Keranjang</button></div>`;
+                openModal(productPopup);
+            }
+            function openNotificationModal(){
+                const content = allNotifications.length === 0 ? '<p class="empty-message">Belum ada notifikasi.</p>' : allNotifications.map(n => `<div class="notification-item"><p>${n.pesan}</p><div class="date">${n.tanggal}</div></div>`).join('');
+                notificationModal.innerHTML = `<div class="modal-content"><span class="close-btn">&times;</span><h2>Informasi & Notifikasi</h2><div class="notification-list">${content}</div></div>`;
+                openModal(notificationModal);
+            }
+            function openAdminModal(){
+                 adminModal.innerHTML = `<div class="modal-content"><span class="close-btn">&times;</span><h2>Panel Admin</h2><div class="admin-tabs"><button class="admin-tab active" data-tab="produk">Produk</button><button class="admin-tab" data-tab="transaksi">Riwayat</button><button class="admin-tab" data-tab="notifikasi">Notifikasi</button></div><div id="tab-produk" class="admin-content active"></div><div id="tab-transaksi" class="admin-content"></div><div id="tab-notifikasi" class="admin-content"></div></div>`;
+                updateAdminTab('produk');
+                openModal(adminModal);
+            }
+            const saveCartToStorage = () => localStorage.setItem('cart', JSON.stringify(cart));
+            const loadCartFromStorage = () => { cart = JSON.parse(localStorage.getItem('cart')) || []; updateCartIndicator(); };
+            const updateCartIndicator = () => { const count = cart.reduce((sum, item) => sum + item.qty, 0); cartIndicator.textContent = count; cartIndicator.classList.toggle('visible', count > 0); };
+            function addToCart(product, qty, varian) {
+                const existing = cart.find(i => i.id === product.id && i.varianDipilih === varian);
+                if (existing) existing.qty += qty; else cart.push({ ...product, qty, varianDipilih: varian });
+                updateCartIndicator();
+                saveCartToStorage();
+            }
+            async function processOrder() {
+    if (cart.length === 0) return;
+    const btn = document.getElementById('order-btn');
+    btn.disabled=true; btn.textContent='Memproses...';
+    const notes = document.getElementById('cart-notes').value;
+    let totalPrice = 0; 
+    // \n artinya pindah baris baru
+    let message = `Halo Dapur Doa Umi x Risoles Hyra,\nSaya ingin memesan:\n\n`; // <--- BARIS INI SUDAH DIUBAH
+    cart.forEach(i => { const t = i.harga*i.qty; totalPrice+=t; message+=`*${i.nama}* ${i.varianDipilih?`(${i.varianDipilih})`:''}\n- ${i.qty} x ${formatRupiah(i.harga)} = ${formatRupiah(t)}\n\n`; });
+    message+=`*Total: ${formatRupiah(totalPrice)}*\n\n`; if(notes) message+=`Catatan: ${notes}`;
+    try {
+        await fetch(`${SCRIPT_URL}?action=addTransaction`, {method: 'POST', body: JSON.stringify({items: cart.map(i => ({...i, varianDipilih: i.varianDipilih||''})), notes}), mode: 'no-cors'});
+        cart = []; saveCartToStorage(); updateCartIndicator();
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+        closeModal(cartModal);
+    } catch(e){ alert('Gagal mengirim pesanan.'); }
+    finally { btn.disabled=false; btn.textContent='Pesan via WhatsApp'; }
+}
+            function updateAdminTab(tabName) {
+                adminModal.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                adminModal.querySelector(`.admin-tab[data-tab="${tabName}"]`).classList.add('active');
+                adminModal.querySelectorAll('.admin-content').forEach(c => c.classList.remove('active'));
+                const content = adminModal.querySelector(`#tab-${tabName}`);
+                content.classList.add('active');
+
+                if (tabName === 'produk') renderAdminProducts(content);
+                if (tabName === 'transaksi') renderAdminTransactions(content);
+                if (tabName === 'notifikasi') renderAdminNotifications(content);
+            }
+            const renderAdminProducts = (c) => { c.innerHTML = `<h3>Tambah/Edit Produk</h3><form id="product-form" class="admin-form"><input type="hidden" id="product-id"><input type="text" id="product-nama" placeholder="Nama Produk" required><input type="text" id="product-kategori" placeholder="Kategori" required><input type="text" id="product-gambar" placeholder="URL Gambar" required><input type="number" id="product-harga" placeholder="Harga" required><input type="text" id="product-varian" placeholder="Varian (pisah koma)"><button type="submit">Simpan</button></form><h3>Daftar Produk</h3><div style="overflow-x:auto;"><table class="admin-table"><tr><th>Nama</th><th>Aksi</th></tr>${allProducts.map(p => `<tr><td>${p.nama}</td><td><button class="edit-product-btn" data-id="${p.id}">Edit</button><button class="delete-product-btn" data-id="${p.id}">Hapus</button></td></tr>`).join('')}</table></div><button id="force-update-btn" class="admin-form">Paksa Update (Clear Cache)</button>`; }
+            const renderAdminNotifications = (c) => { c.innerHTML = `<h3>Buat Notifikasi</h3><form id="notification-form" class="admin-form"><textarea id="notification-message" placeholder="Tulis info..." rows="3" required></textarea><button type="submit">Kirim</button></form><h3>Riwayat</h3><div id="admin-notification-list">${allNotifications.map(n => `<div class="notification-item"><p>${n.pesan}</p><div class="date">${n.tanggal}</div></div>`).join('')}</div>`; }
+            async function renderAdminTransactions(container) {
+                container.innerHTML = 'Memuat...';
+                try {
+                    const transactions = await fetch(`${SCRIPT_URL}?action=getTransactions&t=${new Date().getTime()}`).then(res => res.json());
+                    const grouped = transactions.reduce((acc, curr) => { (acc[curr['ID Transaksi']] = acc[curr['ID Transaksi']] || []).push(curr); return acc; }, {});
+                    const kategoriMap = {"Risoles": [],"Chicken Crispy": [],"Adds": [],"Lainnya": []};
+                    Object.values(grouped).forEach(items => { const cat = items[0].Kategori.toLowerCase(); if(cat.includes('risoles')) kategoriMap["Risoles"].push(...items); else if(cat.includes('chicken')||cat.includes('ayam')) kategoriMap["Chicken Crispy"].push(...items); else if(['nasi','saus','sambal'].some(a=>cat.includes(a))) kategoriMap["Adds"].push(...items); else kategoriMap["Lainnya"].push(...items); });
+                    let html = `<div style="overflow-x:auto;"><table class="admin-table"><tr><th>ID</th><th>Tgl</th><th>Item</th><th>Qty</th><th>Total</th><th>Catatan</th></tr>`;
+                    for(const [k, v] of Object.entries(kategoriMap)){ if(v.length > 0){ html += `<tr><th colspan="6" style="background-color:var(--card-bg);">${k}</th></tr>`; v.forEach(i => { html += `<tr><td>${i['ID Transaksi']}</td><td>${i.Tanggal}</td><td>${i.Item} (${i['Varian Dipilih']||'-'})</td><td>${i.QTY}</td><td>${formatRupiah(i['Total Harga'])}</td><td>${i.Catatan}</td></tr>`; }); } }
+                    container.innerHTML = html + `</table></div>`;
+                } catch { container.innerHTML = 'Gagal memuat riwayat.'; }
+            }
+            function editProductUI(productId, form) { const p = allProducts.find(p => p.id === productId); form.querySelector('#product-id').value=p.id; form.querySelector('#product-nama').value=p.nama; form.querySelector('#product-kategori').value=p.kategori; form.querySelector('#product-gambar').value=p.gambar; form.querySelector('#product-harga').value=p.harga; form.querySelector('#product-varian').value=p.varian; alert('Data dimuat di form.');}
+            const reloadPage = () => { alert('Aksi berhasil! Data terbaru akan ditampilkan.'); clearCache(); };
+            const submitProductForm = (form) => { const id = form.querySelector('#product-id').value; const data = {id,nama:form.querySelector('#product-nama').value,kategori:form.querySelector('#product-kategori').value,gambar:form.querySelector('#product-gambar').value,harga:form.querySelector('#product-harga').value,varian:form.querySelector('#product-varian').value}; fetch(`${SCRIPT_URL}?action=${id ? 'editProduct' : 'addProduct'}`, {method:'POST', body:JSON.stringify(data), mode:'no-cors'}).then(reloadPage); }
+            const deleteProduct = (id) => { if(confirm('Yakin hapus produk?')){ fetch(`${SCRIPT_URL}?action=deleteProduct`, {method:'POST', body:JSON.stringify({id}), mode:'no-cors'}).then(reloadPage); }}
+            const submitNotificationForm = (form) => { const message = form.querySelector('#notification-message').value; fetch(`${SCRIPT_URL}?action=addNotification`, {method:'POST', body:JSON.stringify({pesan: message}), mode:'no-cors'}).then(reloadPage); }
+            const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+            const switchNav = (activeBtn) => { document.querySelectorAll('.nav-icon').forEach(b => b.classList.remove('active')); activeBtn.classList.add('active'); };
+            const loadTheme = () => { const t = localStorage.getItem('theme'); if(t){document.documentElement.setAttribute('data-theme', t); document.getElementById('theme-switcher').textContent = t==='dark'?'☀️':'🌙';}};
+            const switchTheme = () => { const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); localStorage.setItem('theme', t); document.getElementById('theme-switcher').textContent = t==='dark'?'☀️':'🌙';};
+
+            function attachEventListeners() {
+                document.getElementById('admin-icon').addEventListener('click', () => { const p=prompt("Password Admin:"); if(p===ADMIN_PASSWORD) openAdminModal(); else if(p) alert('Password Salah!');});
+                document.getElementById('theme-switcher').addEventListener('click', switchTheme);
+                document.getElementById('home-btn').addEventListener('click', () => { closeModal(cartModal); closeModal(notificationModal); closeModal(adminModal); switchNav(document.getElementById('home-btn'));});
+                document.getElementById('cart-btn').addEventListener('click', () => { showCart(); switchNav(document.getElementById('cart-btn'));});
+                document.getElementById('notif-btn').addEventListener('click', () => { openNotificationModal(); switchNav(document.getElementById('notif-btn'));});
+                
+                categoryList.addEventListener('click', e => {
+                    const catEl = e.target.closest('.category-icon');
+                    if (catEl) { currentCategory = catEl.dataset.category; renderCategories(); renderProducts(); }
+                });
+                productList.addEventListener('click', e => {
+                    const card = e.target.closest('.product-card');
+                    if (card) openProductPopup(card.dataset.id);
+                });
+
+                document.addEventListener('click', e => {
+                    if (e.target.matches('.close-btn')) { closeModal(e.target.closest('.modal')); return; }
+                    const productPopupEl = e.target.closest('#product-popup');
+                    if(productPopupEl){
+                        if(e.target.matches('.variant')) { e.target.closest('#popup-product-variants').querySelectorAll('.variant').forEach(v=>v.classList.remove('selected')); e.target.classList.add('selected'); productPopupEl.querySelector('.add-to-cart-btn').disabled = false; }
+                        if(e.target.matches('.qty-btn')) { const i=productPopupEl.querySelector('.qty-input'); let v=parseInt(i.value); if(e.target.dataset.action==='increase')v++; else if(v>1)v--; i.value=v; }
+                        if(e.target.matches('.add-to-cart-btn')) { const p=allProducts.find(prod => prod.nama === productPopupEl.querySelector('h2').textContent); const v=productPopupEl.querySelector('.variant.selected')?.textContent||null; const q=parseInt(productPopupEl.querySelector('.qty-input').value); if(p) { addToCart(p,q,v); closeModal(productPopupEl); }}
+                        return;
+                    }
+                    const cartModalEl = e.target.closest('#cart-modal');
+                    if(cartModalEl){
+                        if(e.target.matches('.qty-btn')) { const itemEl = e.target.closest('.cart-item'); const id = itemEl.dataset.id; const varian = itemEl.dataset.varian; const itemInCart = cart.find(i => i.id === id && (i.varianDipilih || '') === varian); if(itemInCart) { if (e.target.dataset.action === 'increase') { itemInCart.qty++; } else if (itemInCart.qty > 1) { itemInCart.qty--; } else { cart = cart.filter(i => i !== itemInCart); } showCart(); saveCartToStorage(); updateCartIndicator(); }}
+                        if(e.target.matches('#order-btn')) processOrder();
+                        return;
+                    }
+                    const adminModalEl = e.target.closest('#admin-modal');
+                    if(adminModalEl){
+                        const form = e.target.closest('form');
+                        if (e.target.matches('.admin-tab')) updateAdminTab(e.target.dataset.tab);
+                        else if (e.target.matches('#force-update-btn')) clearCache();
+                        else if (e.target.matches('.edit-product-btn')) editProductUI(e.target.dataset.id, document.getElementById('product-form'));
+                        else if (e.target.matches('.delete-product-btn')) deleteProduct(e.target.dataset.id);
+                        else if (form && e.target.matches('button[type="submit"]')) { e.preventDefault(); if(form.id === 'product-form') submitProductForm(form); if(form.id === 'notification-form') submitNotificationForm(form); }
+                    }
+                });
+            }
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
